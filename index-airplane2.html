@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Airplane Game</title>
+</head>
+<body>
+	<style type="text/css">
+		#ocean {
+			background-image: url('./img/ocean.jpg');
+			width: 900px;
+			height: 700px;
+		}
+		.player {
+			/* the absolute property enables us to use the CSS 'left' & 'top' properties to position an element */
+			/* however, we will not set the left and right properties here, because that will prevent us from manipulating it's values in JS */
+			position: absolute; 
+			background-image: url('./img/player.png');
+			background-size: contain;
+			width: 70px;
+			height: 75px;
+		}
+		.enemy {
+			position: absolute; 
+			background-image: url('./img/aircraft-fighter.png');
+			width: 90px;
+			height: 75px;
+		}
+		.missile {
+			position: absolute;
+			background-color: red;
+			width: 2px;
+			height: 15px;
+		}
+	</style>
+
+	<div id = "ocean">
+		<div id = "players"></div>
+		<div id = "enemies"></div>
+		<div id = "missiles"></div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+		// we do not write 'px' here, because only if it is a number, can we manipulate it
+		// when we create the player using JS, then we will add a string "px" to the player.left object
+		var player = {
+			left: 450,
+			top: 620
+		}
+		var enemies = [
+			{left: 300, top: 300},
+			{left: 450, top: 250},
+			{left: 200, top: 290},
+			{left: 500, top: 150}
+		];
+		var missiles = [];
+
+		// PLAYER
+		function createPlayer() {
+			let content = "<div class='player' style='left: " +player.left+ "px; top: " +player.top+ "px'></div>";
+			document.getElementById('players').innerHTML = content;
+		};
+		createPlayer();
+
+		// ENEMIES
+		function createEnemies() {
+			let content = ""; 			
+			for(var x = 0; x < enemies.length; x++) { // we are making multiple enemies
+				content = content + "<div class='enemy' style='left: "+enemies[x].left+"px; top: "+enemies[x].top+"px'></div>";
+			};
+			document.getElementById('enemies').innerHTML = content;
+		};
+		function moveEnemies() { // enable enemies to move, as part of gameLoop
+			for (var x = 0; x < enemies.length; x++) {
+				if (enemies[x].top < 620) {
+					enemies[x].top = enemies[x].top + 3;
+					// console.log('enemy position'+enemies[x].top);					
+				}
+			};
+		};
+
+		// MISSILES
+		function createMissiles() { // position missile
+			content = "";
+			for (var x = 0; x < missiles.length; x++) {
+				content = content + "<div class='missile' style='left: "+missiles[x].left+"px; top: "+missiles[x].top+"px'></div>"
+			};
+			document.getElementById('missiles').innerHTML = content;
+		};
+		function moveMissiles() {
+			for (var x = 0; x < missiles.length; x++) {
+				missiles[x].top = missiles[x].top - 16;
+			};
+		}
+
+		// PLAYER
+		document.onkeydown = function(e) { // enable player to move when we press arrow keys
+			console.log(e);
+			if(e.keyCode == 37) {  // LEFT
+				player.left = player.left - 13;
+			};
+			if(e.keyCode == 39) {  // RIGHT
+				player.left = player.left + 13;
+			};
+			if(e.keyCode == 38 && player.top > 500) {  // UP, if player.top is over 550px from top, then move up
+				player.top = player.top - 10;
+			};
+			if(e.keyCode == 40 && player.top < 620) {  // DOWN
+				player.top = player.top + 10;
+			};
+			if(e.keyCode == 32) { // if spacebar pressed, we will fire a missile
+				missiles.push( {left: (player.left+34), top: (player.top-8) });
+				createMissiles();
+			}
+			createPlayer();
+		};
+
+		// GAME LOOP
+		function gameLoop() {
+			// createPlayer();
+
+			moveEnemies();
+			createEnemies();
+
+			moveMissiles();
+			createMissiles();
+
+			setTimeout(gameLoop, 100);
+		}
+		gameLoop();
+
+	</script>
+</body>
+</html>
